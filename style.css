@@ -1,0 +1,468 @@
+/*
+Theme Name: Wonder Burrow
+Theme URI: https://github.com/danieljwonder/danielwonder-native-archive
+Description: Ollie child theme that applies the danielwonder native-archive design direction — cream/ink palette, purple accent, monospace metadata, hairline rules, and automatic dark mode.
+Author: Daniel Wonder
+Template: ollie
+Version: 0.11.0
+Requires at least: 6.5
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: wonder-burrow
+*/
+
+/* ------------------------------------------------------------------
+   Tokens the theme.json presets can't express.
+   Light values live in theme.json; dark mode flips the preset
+   custom properties themselves, so every Ollie style that references
+   a preset follows along automatically.
+------------------------------------------------------------------- */
+
+body {
+	--dw-accent-soft: color-mix(in srgb, var(--wp--preset--color--primary) 10%, transparent);
+	--dw-shadow: 0 24px 80px rgba(23, 20, 17, 0.08);
+}
+
+/* Dark tokens apply when the OS prefers dark (unless the header toggle
+   forced light), or when the toggle forced dark. The toggle stores its
+   choice in localStorage and sets data-dw-scheme on <html> — see
+   assets/scheme-toggle.js. Token list is duplicated in both blocks. */
+@media (prefers-color-scheme: dark) {
+	html:not([data-dw-scheme="light"]) body {
+		--wp--preset--color--base: #11100f;
+		--wp--preset--color--main: #f4efe6;
+		--wp--preset--color--main-accent: #3a352f;
+		--wp--preset--color--secondary: #a69b8e;
+		--wp--preset--color--tertiary: #1b1916;
+		--wp--preset--color--primary: #ffa45c;
+		--wp--preset--color--primary-accent: #33200f;
+		--wp--preset--color--primary-alt: #b34e00;
+		--wp--preset--color--primary-alt-accent: #ffdfc2;
+		--wp--preset--color--border-light: #35302a;
+		--wp--preset--color--border-dark: #6c6258;
+		--dw-accent-soft: color-mix(in srgb, var(--wp--preset--color--primary) 12%, transparent);
+		--dw-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+	}
+}
+
+html[data-dw-scheme="dark"] body {
+	--wp--preset--color--base: #11100f;
+	--wp--preset--color--main: #f4efe6;
+	--wp--preset--color--main-accent: #3a352f;
+	--wp--preset--color--secondary: #a69b8e;
+	--wp--preset--color--tertiary: #1b1916;
+	--wp--preset--color--primary: #ffa45c;
+	--wp--preset--color--primary-accent: #33200f;
+	--wp--preset--color--primary-alt: #b34e00;
+	--wp--preset--color--primary-alt-accent: #ffdfc2;
+	--wp--preset--color--border-light: #35302a;
+	--wp--preset--color--border-dark: #6c6258;
+	--dw-accent-soft: color-mix(in srgb, var(--wp--preset--color--primary) 12%, transparent);
+	--dw-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+	color-scheme: dark;
+}
+
+html[data-dw-scheme="light"] body {
+	color-scheme: light;
+}
+
+/* Soft radial accent wash behind the whole page, as in the draft. */
+body {
+	color-scheme: light dark;
+	background: radial-gradient(circle at top left, var(--dw-accent-soft), transparent 36rem)
+		var(--wp--preset--color--base);
+}
+
+a {
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.18em;
+}
+
+/* Sticky footer: short pages (a one-line note) don't fill the
+   viewport, so let the page column stretch and push the footer to the
+   bottom. .wp-site-blocks is the block-theme root wrapper. */
+body {
+	min-height: 100vh;
+	min-height: 100svh;
+}
+
+.wp-site-blocks {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	min-height: 100svh;
+}
+
+.wp-site-blocks > footer {
+	margin-block-start: auto;
+}
+
+/* ------------------------------------------------------------------
+   Utility classes used by the bundled patterns. Apply them to any
+   block via "Additional CSS class(es)" in the editor.
+------------------------------------------------------------------- */
+
+/* Small-caps monospace kicker, e.g. "danielwonder.com draft". */
+.dw-eyebrow {
+	color: var(--wp--preset--color--secondary);
+	font-family: var(--wp--preset--font-family--monospace);
+	font-size: 0.78rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.dw-mono {
+	font-family: var(--wp--preset--font-family--monospace);
+}
+
+/* Oversized display treatment for the site title / hero heading. */
+.dw-display {
+	font-size: clamp(3rem, 10vw, 7.5rem) !important;
+	line-height: 0.88 !important;
+	letter-spacing: -0.08em !important;
+	font-weight: 600;
+}
+
+.dw-display a {
+	text-decoration: none;
+	color: inherit;
+}
+
+/* Hairline-ruled section: add to any Group to get the top rule. */
+.dw-rule-top {
+	border-top: 1px solid var(--wp--preset--color--border-light);
+}
+
+/* Query Loop styled as the draft's archive list. */
+.dw-archive-list .wp-block-post-template {
+	list-style: none;
+	padding-left: 0;
+	margin: 0;
+}
+
+.dw-archive-list .wp-block-post {
+	border-top: 1px solid var(--wp--preset--color--border-light);
+	padding: 18px 0;
+	margin: 0;
+}
+
+.dw-archive-list .wp-block-post-title {
+	letter-spacing: -0.025em;
+	margin: 0.1rem 0 0.35rem;
+}
+
+.dw-archive-list .wp-block-post-title a {
+	text-decoration: none;
+}
+
+.dw-archive-list .wp-block-post-title a:hover {
+	text-decoration: underline;
+}
+
+.dw-archive-list .wp-block-post-excerpt {
+	max-width: 44rem;
+}
+
+.dw-archive-list .wp-block-post-excerpt__more-text {
+	display: none;
+}
+
+/* Notes (`note` CPT synced from Nostr) mixed into the archive list:
+   no title, the note text itself is the entry, mono kind label on the
+   date line. Relies on the type-note post class the Query Loop emits. */
+.dw-archive-list .type-note .wp-block-post-title {
+	display: none;
+}
+
+.dw-archive-list .type-note .wp-block-post-excerpt {
+	color: var(--wp--preset--color--main);
+	max-width: 42rem;
+}
+
+/* Kind labels live on the <time> element so the inline rabbit button
+   can follow them at the end of the meta line. */
+.dw-archive-list .wp-block-post-date time::after {
+	content: " · writing";
+}
+
+.dw-archive-list .type-note .wp-block-post-date time::after {
+	content: " · note";
+}
+
+/* Pill treatment for category/tag term lists. */
+.dw-pills a {
+	display: inline-block;
+	border: 1px solid var(--wp--preset--color--border-light);
+	border-radius: 999px;
+	padding: 3px 9px;
+	text-decoration: none;
+	font-size: 0.82rem;
+}
+
+.dw-pills a:hover {
+	box-shadow: 0 0 0 4px var(--dw-accent-soft);
+}
+
+/* Current view's filter pill renders filled, like the draft's active
+   filter. Keyed on the body classes of the three list views. */
+body.home .dw-filter-pills a[href="/"],
+body.page-id-10 .dw-filter-pills a[href="/blog/"],
+body.post-type-archive-note .dw-filter-pills a[href="/note/"] {
+	background: var(--wp--preset--color--main);
+	color: var(--wp--preset--color--base);
+	border-color: var(--wp--preset--color--main);
+}
+
+/* Raised panel card, as used by the draft's source-reveal panel. */
+.dw-panel {
+	background: var(--wp--preset--color--tertiary);
+	border: 1px solid var(--wp--preset--color--border-light);
+	border-radius: 18px;
+	box-shadow: var(--dw-shadow);
+}
+
+.dw-archive-list .wp-block-post-date,
+body.single .wp-block-post-date {
+	opacity: 0.8;
+}
+
+.dw-archive-list .wp-block-post-date {
+	margin-top: 10px;
+}
+
+.dw-archive-list .wp-block-post-date a {
+	text-decoration: none;
+}
+
+.dw-archive-list .wp-block-post-date a:hover {
+	text-decoration: underline;
+}
+
+/* Notes show their full content in the archive (images, embeds and all)
+   while long-form posts keep the plain excerpt. Both blocks render in
+   the loop; CSS picks per type via the type-* post classes. */
+.dw-archive-list .wp-block-post-content {
+	display: none;
+}
+
+.dw-archive-list .type-note .wp-block-post-content {
+	display: block;
+	max-width: 42rem;
+}
+
+.dw-archive-list .type-note .wp-block-post-excerpt {
+	display: none;
+}
+
+.dw-archive-list .type-note .wp-block-post-content img,
+.dw-archive-list .type-note .wp-block-post-content video,
+.dw-archive-list .type-note .wp-block-post-content iframe {
+	max-width: 100%;
+	height: auto;
+	border-radius: 12px;
+	margin: 10px 0 0;
+}
+
+/* Circular buttons: the light/dark toggle and the rabbit source-reveal. */
+.dw-scheme-toggle,
+.dw-rabbit {
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	border: 1px solid var(--wp--preset--color--border-light);
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+	font-size: 1.05rem;
+	line-height: 1;
+	padding: 0;
+}
+
+.dw-scheme-toggle:hover,
+.dw-scheme-toggle:focus-visible,
+.dw-rabbit:hover,
+.dw-rabbit:focus-visible {
+	box-shadow: 0 0 0 4px var(--dw-accent-soft);
+	outline: none;
+}
+
+/* Masthead rows are plain flex — brand left, controls right — so
+   alignment holds on every viewport with no absolute positioning.
+   Hero: eyebrow + toggle on the top line, then the avatar inline with
+   the display title. Inner pages use the compact masthead pattern
+   with the same skeleton, scaled down. */
+.dw-hero-top {
+	margin-bottom: 18px;
+}
+
+.dw-hero-brand {
+	margin-bottom: 12px;
+}
+
+.dw-site-header .dw-avatar {
+	width: 40px;
+	height: 40px;
+}
+
+.dw-site-header .wp-block-site-title a {
+	text-decoration: none;
+}
+
+/* Round profile photo above the hero eyebrow, levels.io style. */
+.dw-avatar {
+	display: block;
+	width: 72px;
+	height: 72px;
+	border-radius: 50%;
+	border: 1px solid var(--wp--preset--color--border-light);
+	margin: 0;
+	flex-shrink: 0;
+}
+
+/* Long bare URLs in synced notes must wrap, not force horizontal
+   scroll on mobile. */
+.wp-block-post-content,
+.wp-block-post-excerpt {
+	overflow-wrap: anywhere;
+}
+
+/* The rabbit sits inline at the end of the meta line (date · kind · 🐇);
+   the bubble it reveals expands directly beneath that line with a caret
+   pointing back at the rabbit. Injected by assets/rabbit.js from the
+   wonder-burrow/v1/source endpoint. */
+.dw-rabbit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	vertical-align: middle;
+}
+
+.dw-rabbit svg {
+	width: 15px;
+	height: 15px;
+	display: block;
+}
+
+.dw-rabbit[aria-expanded="true"] {
+	background: var(--wp--preset--color--tertiary);
+	box-shadow: 0 0 0 4px var(--dw-accent-soft);
+}
+
+.dw-source-panel {
+	position: relative;
+	margin: 10px 0 6px;
+	padding: 18px;
+	font-size: 0.92rem;
+	max-width: 44rem;
+}
+
+.dw-source-panel::before {
+	content: "";
+	position: absolute;
+	top: -6.5px;
+	left: var(--dw-caret-x, 24px);
+	width: 12px;
+	height: 12px;
+	transform: rotate(45deg);
+	background: var(--wp--preset--color--tertiary);
+	border-top: 1px solid var(--wp--preset--color--border-light);
+	border-left: 1px solid var(--wp--preset--color--border-light);
+}
+
+/* Single post/note pages: kind label on the meta line (the archive
+   rules above are scoped to .dw-archive-list) and prose capped at a
+   readable measure while keeping the shared 920px left edge. */
+body.single-post .wp-block-post-date time::after {
+	content: " · writing";
+}
+
+body.single-note .wp-block-post-date time::after {
+	content: " · note";
+}
+
+body.single .wp-block-post-content {
+	max-width: 46rem;
+}
+
+/* Nostr for WP appends its own timestamp + raw event-ID under note
+   content (no settings UI for it yet — see the handover doc). The
+   theme's meta line + rabbit carry that provenance now, so hide the
+   duplicate. */
+body.single-note .nostr-note-meta {
+	display: none;
+}
+
+/* Embed cards appended to note content by the tweet-lift filter in
+   functions.php. */
+.dw-embed-card a {
+	display: inline-block;
+	border: 1px solid var(--wp--preset--color--border-light);
+	border-radius: 12px;
+	padding: 10px 14px;
+	text-decoration: none;
+	font-family: var(--wp--preset--font-family--monospace);
+	font-size: 0.85rem;
+	color: var(--wp--preset--color--secondary);
+}
+
+.dw-embed-card a:hover {
+	box-shadow: 0 0 0 4px var(--dw-accent-soft);
+}
+
+.dw-note-embed {
+	margin: 14px 0 0;
+	max-width: 42rem;
+}
+
+.dw-note-embed iframe {
+	max-width: 100%;
+	border-radius: 12px;
+}
+
+.dw-source-panel h4 {
+	margin: 0 0 8px;
+	font-size: 1rem;
+}
+
+.dw-source-block {
+	min-width: 0;
+	margin: 0 0 12px;
+}
+
+.dw-source-block:last-child {
+	margin-bottom: 0;
+}
+
+.dw-source-block code {
+	display: block;
+	overflow-wrap: anywhere;
+	font-size: 0.82rem;
+	color: var(--wp--preset--color--secondary);
+}
+
+.dw-source-meta {
+	color: var(--wp--preset--color--secondary);
+	font-family: var(--wp--preset--font-family--monospace);
+	font-size: 0.78rem;
+	margin: 6px 0 0;
+	overflow-wrap: anywhere;
+}
+
+.dw-source-links {
+	margin: 10px 0 0;
+}
+
+.dw-source-links a {
+	border: 1px solid var(--wp--preset--color--border-light);
+	border-radius: 999px;
+	padding: 5px 9px;
+	text-decoration: none;
+	font-size: 0.85rem;
+}
+
+.dw-source-links a:hover {
+	box-shadow: 0 0 0 4px var(--dw-accent-soft);
+}

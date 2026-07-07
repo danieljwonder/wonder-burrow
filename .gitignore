@@ -1,0 +1,11 @@
+# Build artifact from README install step
+wonder-burrow.zip
+
+# macOS
+.DS_Store
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*~
