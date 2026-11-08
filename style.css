@@ -4,7 +4,7 @@ Theme URI: https://github.com/danieljwonder/danielwonder-native-archive
 Description: Ollie child theme that applies the danielwonder native-archive design direction — Monokai palettes, monospace metadata, hairline rules, and automatic dark mode.
 Author: Daniel Wonder
 Template: ollie
-Version: 0.12.0
+Version: 0.12.1
 Requires at least: 6.5
 Requires PHP: 7.4
 License: GNU General Public License v2 or later
@@ -626,6 +626,17 @@ body.single .wp-block-post-date,
 body.single .wp-block-post-terms,
 body.single .dw-source-panel {
 	max-width: 46rem;
+}
+
+/* Core's constrained layout centres every child with margin:auto
+   !important, so the 46rem blocks above sat 92px inside the 920px
+   title. Pin them to the 920px column's left edge instead. */
+body.single main.wp-block-group > .wp-block-post-content,
+body.single main.wp-block-group > .wp-block-post-date,
+body.single main.wp-block-group > .wp-block-post-terms,
+body.single main.wp-block-group > .dw-source-panel {
+	margin-left: max(0px, calc((100% - 920px) / 2)) !important;
+	margin-right: auto !important;
 }
 
 /* Nostr for WP appends its own timestamp + raw event-ID under note
