@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check tag matches theme version
+        run: |
+          v=$(sed -n 's/^Version: *//p' style.css | tr -d '\r')
+          if [ "v$v" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match style.css Version $v"
+            exit 1
+          fi
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+
+      - name: Build package
+        run: |
+          git archive --format=zip --prefix=wonder-burrow/ -o wonder-burrow.zip HEAD
+          unzip -l wonder-burrow.zip
+          jq -n \
+            --arg version "$VERSION" \
+            --arg package "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/wonder-burrow.zip" \
+            '{version: $version, package: $package}' > release.json
+          cat release.json
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" wonder-burrow.zip release.json --verify-tag --generate-notes
