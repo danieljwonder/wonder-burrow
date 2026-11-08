@@ -1,10 +1,10 @@
 /*
 Theme Name: Wonder Burrow
 Theme URI: https://github.com/danieljwonder/danielwonder-native-archive
-Description: Ollie child theme that applies the danielwonder native-archive design direction — cream/ink palette, purple accent, monospace metadata, hairline rules, and automatic dark mode.
+Description: Ollie child theme that applies the danielwonder native-archive design direction — Monokai palettes, monospace metadata, hairline rules, and automatic dark mode.
 Author: Daniel Wonder
 Template: ollie
-Version: 0.11.0
+Version: 0.12.0
 Requires at least: 6.5
 Requires PHP: 7.4
 License: GNU General Public License v2 or later
@@ -14,14 +14,60 @@ Text Domain: wonder-burrow
 
 /* ------------------------------------------------------------------
    Tokens the theme.json presets can't express.
-   Light values live in theme.json; dark mode flips the preset
+   Light UI values live in theme.json; dark mode flips the preset
    custom properties themselves, so every Ollie style that references
-   a preset follows along automatically.
+   a preset follows along automatically. Code colors intentionally use
+   the opposite scheme: Remastered in light mode, Light Sun in dark mode.
 ------------------------------------------------------------------- */
 
 body {
+	--dw-sun-base: #f8efe7;
+	--dw-sun-main: #2c232e;
+	--dw-sun-surface: #fdf7f3;
+	--dw-sun-surface-alt: #eee5de;
+	--dw-sun-muted: #72696d;
+	--dw-sun-muted-soft: #a59c9c;
+	--dw-sun-border: #ded5d0;
+	--dw-sun-selection: #beb5b3;
+	--dw-sun-red: #ce4770;
+	--dw-sun-orange: #d4572b;
+	--dw-sun-yellow: #b16803;
+	--dw-sun-green: #218871;
+	--dw-sun-blue: #2473b6;
+	--dw-sun-purple: #6851a2;
+	--dw-remastered-base: #0c0c0c;
+	--dw-remastered-main: #d9d9d9;
+	--dw-remastered-surface: #1a1a1a;
+	--dw-remastered-surface-alt: #343434;
+	--dw-remastered-muted: #625e4c;
+	--dw-remastered-muted-strong: #c4c5b5;
+	--dw-remastered-red: #f4005f;
+	--dw-remastered-orange: #fd971f;
+	--dw-remastered-yellow: #e0d561;
+	--dw-remastered-green: #98e024;
+	--dw-remastered-blue: #58d1eb;
+	--dw-remastered-purple: #9d65ff;
+	--dw-code-bg: var(--dw-remastered-base);
+	--dw-code-fg: var(--dw-remastered-main);
+	--dw-code-border: var(--dw-remastered-surface-alt);
+	--dw-code-muted: var(--dw-remastered-muted);
+	--dw-code-punctuation: var(--dw-remastered-muted-strong);
+	--dw-code-keyword: var(--dw-remastered-red);
+	--dw-code-string: var(--dw-remastered-yellow);
+	--dw-code-function: var(--dw-remastered-green);
+	--dw-code-number: var(--dw-remastered-purple);
+	--dw-code-class: var(--dw-remastered-blue);
+	--dw-code-tag: var(--dw-remastered-red);
+	--dw-code-attr: var(--dw-remastered-blue);
+	--dw-code-variable: var(--dw-remastered-main);
+	--dw-code-operator: var(--dw-remastered-red);
+	--dw-code-inserted: var(--dw-remastered-green);
+	--dw-code-deleted: var(--dw-remastered-red);
+	--dw-code-selection: var(--dw-remastered-surface-alt);
+	--dw-code-inline-bg: color-mix(in srgb, var(--dw-code-bg) 92%, var(--wp--preset--color--base));
+	--dw-code-color-scheme: dark;
 	--dw-accent-soft: color-mix(in srgb, var(--wp--preset--color--primary) 10%, transparent);
-	--dw-shadow: 0 24px 80px rgba(23, 20, 17, 0.08);
+	--dw-shadow: 0 24px 80px rgba(44, 35, 46, 0.08);
 }
 
 /* Dark tokens apply when the OS prefers dark (unless the header toggle
@@ -30,34 +76,72 @@ body {
    assets/scheme-toggle.js. Token list is duplicated in both blocks. */
 @media (prefers-color-scheme: dark) {
 	html:not([data-dw-scheme="light"]) body {
-		--wp--preset--color--base: #11100f;
-		--wp--preset--color--main: #f4efe6;
-		--wp--preset--color--main-accent: #3a352f;
-		--wp--preset--color--secondary: #a69b8e;
-		--wp--preset--color--tertiary: #1b1916;
-		--wp--preset--color--primary: #ffa45c;
-		--wp--preset--color--primary-accent: #33200f;
-		--wp--preset--color--primary-alt: #b34e00;
-		--wp--preset--color--primary-alt-accent: #ffdfc2;
-		--wp--preset--color--border-light: #35302a;
-		--wp--preset--color--border-dark: #6c6258;
+		--wp--preset--color--base: var(--dw-remastered-base);
+		--wp--preset--color--main: var(--dw-remastered-main);
+		--wp--preset--color--main-accent: var(--dw-remastered-muted);
+		--wp--preset--color--secondary: var(--dw-remastered-muted-strong);
+		--wp--preset--color--tertiary: var(--dw-remastered-surface);
+		--wp--preset--color--primary: var(--dw-remastered-red);
+		--wp--preset--color--primary-accent: var(--dw-remastered-surface-alt);
+		--wp--preset--color--primary-alt: var(--dw-remastered-orange);
+		--wp--preset--color--primary-alt-accent: var(--dw-remastered-yellow);
+		--wp--preset--color--border-light: var(--dw-remastered-surface-alt);
+		--wp--preset--color--border-dark: var(--dw-remastered-muted);
+		--dw-code-bg: var(--dw-sun-base);
+		--dw-code-fg: var(--dw-sun-main);
+		--dw-code-border: var(--dw-sun-border);
+		--dw-code-muted: var(--dw-sun-muted-soft);
+		--dw-code-punctuation: var(--dw-sun-muted);
+		--dw-code-keyword: var(--dw-sun-red);
+		--dw-code-string: var(--dw-sun-yellow);
+		--dw-code-function: var(--dw-sun-green);
+		--dw-code-number: var(--dw-sun-purple);
+		--dw-code-class: var(--dw-sun-blue);
+		--dw-code-tag: var(--dw-sun-red);
+		--dw-code-attr: var(--dw-sun-blue);
+		--dw-code-variable: var(--dw-sun-main);
+		--dw-code-operator: var(--dw-sun-red);
+		--dw-code-inserted: var(--dw-sun-green);
+		--dw-code-deleted: var(--dw-sun-red);
+		--dw-code-selection: var(--dw-sun-selection);
+		--dw-code-inline-bg: color-mix(in srgb, var(--dw-code-bg) 92%, var(--wp--preset--color--base));
+		--dw-code-color-scheme: light;
 		--dw-accent-soft: color-mix(in srgb, var(--wp--preset--color--primary) 12%, transparent);
 		--dw-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
 	}
 }
 
 html[data-dw-scheme="dark"] body {
-	--wp--preset--color--base: #11100f;
-	--wp--preset--color--main: #f4efe6;
-	--wp--preset--color--main-accent: #3a352f;
-	--wp--preset--color--secondary: #a69b8e;
-	--wp--preset--color--tertiary: #1b1916;
-	--wp--preset--color--primary: #ffa45c;
-	--wp--preset--color--primary-accent: #33200f;
-	--wp--preset--color--primary-alt: #b34e00;
-	--wp--preset--color--primary-alt-accent: #ffdfc2;
-	--wp--preset--color--border-light: #35302a;
-	--wp--preset--color--border-dark: #6c6258;
+	--wp--preset--color--base: var(--dw-remastered-base);
+	--wp--preset--color--main: var(--dw-remastered-main);
+	--wp--preset--color--main-accent: var(--dw-remastered-muted);
+	--wp--preset--color--secondary: var(--dw-remastered-muted-strong);
+	--wp--preset--color--tertiary: var(--dw-remastered-surface);
+	--wp--preset--color--primary: var(--dw-remastered-red);
+	--wp--preset--color--primary-accent: var(--dw-remastered-surface-alt);
+	--wp--preset--color--primary-alt: var(--dw-remastered-orange);
+	--wp--preset--color--primary-alt-accent: var(--dw-remastered-yellow);
+	--wp--preset--color--border-light: var(--dw-remastered-surface-alt);
+	--wp--preset--color--border-dark: var(--dw-remastered-muted);
+	--dw-code-bg: var(--dw-sun-base);
+	--dw-code-fg: var(--dw-sun-main);
+	--dw-code-border: var(--dw-sun-border);
+	--dw-code-muted: var(--dw-sun-muted-soft);
+	--dw-code-punctuation: var(--dw-sun-muted);
+	--dw-code-keyword: var(--dw-sun-red);
+	--dw-code-string: var(--dw-sun-yellow);
+	--dw-code-function: var(--dw-sun-green);
+	--dw-code-number: var(--dw-sun-purple);
+	--dw-code-class: var(--dw-sun-blue);
+	--dw-code-tag: var(--dw-sun-red);
+	--dw-code-attr: var(--dw-sun-blue);
+	--dw-code-variable: var(--dw-sun-main);
+	--dw-code-operator: var(--dw-sun-red);
+	--dw-code-inserted: var(--dw-sun-green);
+	--dw-code-deleted: var(--dw-sun-red);
+	--dw-code-selection: var(--dw-sun-selection);
+	--dw-code-inline-bg: color-mix(in srgb, var(--dw-code-bg) 92%, var(--wp--preset--color--base));
+	--dw-code-color-scheme: light;
 	--dw-accent-soft: color-mix(in srgb, var(--wp--preset--color--primary) 12%, transparent);
 	--dw-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
 	color-scheme: dark;
@@ -77,6 +161,158 @@ body {
 a {
 	text-decoration-thickness: 0.08em;
 	text-underline-offset: 0.18em;
+}
+
+code,
+kbd,
+samp {
+	font-family: var(--wp--preset--font-family--monospace);
+}
+
+:not(pre) > code {
+	background: var(--dw-code-inline-bg);
+	border: 1px solid var(--dw-code-border);
+	border-radius: 6px;
+	color: var(--dw-code-fg);
+	font-size: 0.92em;
+	padding: 0.08em 0.28em;
+}
+
+pre,
+.wp-block-code,
+pre[class*="language-"],
+code[class*="language-"],
+.hljs {
+	background: var(--dw-code-bg);
+	color-scheme: var(--dw-code-color-scheme);
+	color: var(--dw-code-fg);
+}
+
+pre,
+.wp-block-code {
+	border: 1px solid var(--dw-code-border);
+	border-radius: 10px;
+	box-shadow: var(--dw-shadow);
+	overflow-x: auto;
+	padding: 1rem;
+}
+
+.wp-block-code code,
+pre code,
+pre[class*="language-"] code,
+code[class*="language-"] {
+	background: transparent;
+	border: 0;
+	color: inherit;
+	display: block;
+	font-size: 0.92rem;
+	line-height: 1.6;
+	padding: 0;
+	text-shadow: none;
+}
+
+pre::selection,
+code::selection,
+pre ::selection,
+code ::selection,
+.hljs ::selection {
+	background: var(--dw-code-selection);
+	color: var(--dw-code-fg);
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata,
+.hljs-comment,
+.hljs-quote {
+	color: var(--dw-code-muted);
+}
+
+.token.punctuation,
+.hljs-punctuation {
+	color: var(--dw-code-punctuation);
+}
+
+.token.keyword,
+.token.atrule,
+.token.operator,
+.token.important,
+.token.selector,
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+	color: var(--dw-code-keyword);
+}
+
+.token.string,
+.token.char,
+.token.attr-value,
+.hljs-string,
+.hljs-doctag {
+	color: var(--dw-code-string);
+}
+
+.token.function,
+.token.builtin,
+.hljs-title,
+.hljs-section,
+.hljs-built_in,
+.hljs-builtin-name {
+	color: var(--dw-code-function);
+}
+
+.token.number,
+.token.boolean,
+.token.constant,
+.token.symbol,
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-bullet {
+	color: var(--dw-code-number);
+}
+
+.token.class-name,
+.token.namespace,
+.token.property,
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-template-variable,
+.hljs-variable {
+	color: var(--dw-code-class);
+}
+
+.token.tag,
+.token.deleted,
+.hljs-tag,
+.hljs-name,
+.hljs-deletion {
+	color: var(--dw-code-tag);
+}
+
+.token.attr-name,
+.hljs-attr,
+.hljs-attribute {
+	color: var(--dw-code-attr);
+}
+
+.token.variable,
+.hljs-variable {
+	color: var(--dw-code-variable);
+}
+
+.token.inserted,
+.hljs-addition {
+	color: var(--dw-code-inserted);
+}
+
+.token.regex,
+.token.url,
+.hljs-regexp,
+.hljs-link,
+.hljs-meta {
+	color: var(--dw-code-operator);
 }
 
 /* Sticky footer: short pages (a one-line note) don't fill the
@@ -256,8 +492,7 @@ body.single .wp-block-post-date {
 }
 
 .dw-archive-list .type-note .wp-block-post-content img,
-.dw-archive-list .type-note .wp-block-post-content video,
-.dw-archive-list .type-note .wp-block-post-content iframe {
+.dw-archive-list .type-note .wp-block-post-content video {
 	max-width: 100%;
 	height: auto;
 	border-radius: 12px;
@@ -387,6 +622,12 @@ body.single .wp-block-post-content {
 	max-width: 46rem;
 }
 
+body.single .wp-block-post-date,
+body.single .wp-block-post-terms,
+body.single .dw-source-panel {
+	max-width: 46rem;
+}
+
 /* Nostr for WP appends its own timestamp + raw event-ID under note
    content (no settings UI for it yet — see the handover doc). The
    theme's meta line + rabbit carry that provenance now, so hide the
@@ -396,7 +637,7 @@ body.single-note .nostr-note-meta {
 }
 
 /* Embed cards appended to note content by the tweet-lift filter in
-   functions.php. */
+   functions.php (twitter/x with link-card fallback, youtube when oEmbed works). */
 .dw-embed-card a {
 	display: inline-block;
 	border: 1px solid var(--wp--preset--color--border-light);
@@ -417,9 +658,24 @@ body.single-note .nostr-note-meta {
 	max-width: 42rem;
 }
 
-.dw-note-embed iframe {
+/* height:auto on iframes squashes YouTube players — keep 16:9 */
+.dw-note-embed:has(iframe),
+.dw-note-embed .wp-block-embed__wrapper {
+	aspect-ratio: 16 / 9;
 	max-width: 100%;
+}
+
+.dw-note-embed iframe {
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	border: 0;
 	border-radius: 12px;
+}
+
+.dw-note-embed blockquote {
+	margin: 0;
 }
 
 .dw-source-panel h4 {

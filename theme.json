@@ -11,57 +11,57 @@
 				{
 					"name": "Primary",
 					"slug": "primary",
-					"color": "#FF6B0A"
+					"color": "#CE4770"
 				},
 				{
 					"name": "Primary Accent",
 					"slug": "primary-accent",
-					"color": "#FBEADC"
+					"color": "#DED5D0"
 				},
 				{
 					"name": "Primary Alt",
 					"slug": "primary-alt",
-					"color": "#FFB27A"
+					"color": "#D4572B"
 				},
 				{
 					"name": "Primary Alt Accent",
 					"slug": "primary-alt-accent",
-					"color": "#4A2410"
+					"color": "#B16803"
 				},
 				{
 					"name": "Main",
 					"slug": "main",
-					"color": "#171411"
+					"color": "#2C232E"
 				},
 				{
 					"name": "Main Accent",
 					"slug": "main-accent",
-					"color": "#DAD4C9"
+					"color": "#A59C9C"
 				},
 				{
 					"name": "Base",
 					"slug": "base",
-					"color": "#F7F4EC"
+					"color": "#F8EFE7"
 				},
 				{
 					"name": "Secondary",
 					"slug": "secondary",
-					"color": "#6C6258"
+					"color": "#72696D"
 				},
 				{
 					"name": "Tertiary",
 					"slug": "tertiary",
-					"color": "#FFFAF0"
+					"color": "#FDF7F3"
 				},
 				{
 					"name": "Border Light",
 					"slug": "border-light",
-					"color": "#E2DCD1"
+					"color": "#DED5D0"
 				},
 				{
 					"name": "Border Dark",
 					"slug": "border-dark",
-					"color": "#4A443D"
+					"color": "#A59C9C"
 				}
 			]
 		},

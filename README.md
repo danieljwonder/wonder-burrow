@@ -1,22 +1,24 @@
 # Wonder Burrow — Ollie child theme
 
 Applies the [native-archive draft](../../src/styles.css) design direction to a
-WordPress site running the [Ollie](https://olliewp.com) block theme: cream/ink
-palette, purple accent, monospace metadata, hairline rules, oversized display
-title, and automatic dark mode via `prefers-color-scheme`.
+WordPress site running the [Ollie](https://olliewp.com) block theme: Monokai
+Pro Light Sun in light mode, Monokai Remastered in dark mode, monospace
+metadata, hairline rules, oversized display title, and automatic dark mode via
+`prefers-color-scheme`.
 
 ## How it works
 
 - **theme.json** remaps Ollie's existing palette slots (`primary`, `main`,
-  `base`, `secondary`, `tertiary`, `border-light`, …) to the draft's tokens, so
-  every Ollie template, pattern, and block style picks up the new look without
-  edits. Fonts switch to the system sans/mono stacks the draft uses (this also
-  drops the Mona Sans webfont weight).
+  `base`, `secondary`, `tertiary`, `border-light`, …) to Monokai Pro Light Sun
+  tokens, so every Ollie template, pattern, and block style picks up the light
+  look without edits. Fonts switch to the system sans/mono stacks the draft uses
+  (this also drops the Mona Sans webfont weight).
 - **style.css** handles what theme.json can't: dark mode flips the
-  `--wp--preset--color--*` custom properties themselves, the radial accent
-  wash sits behind the page, and a handful of `dw-*` utility classes
-  (`dw-eyebrow`, `dw-mono`, `dw-display`, `dw-pills`, `dw-panel`,
-  `dw-rule-top`, `dw-archive-list`) recreate the draft's signature details.
+  `--wp--preset--color--*` custom properties to Monokai Remastered, code blocks
+  use the opposite palette of the active UI mode, the radial accent wash sits
+  behind the page, and a handful of `dw-*` utility classes (`dw-eyebrow`,
+  `dw-mono`, `dw-display`, `dw-pills`, `dw-panel`, `dw-rule-top`,
+  `dw-archive-list`) recreate the draft's signature details.
 - **patterns/** ships two starting points: **Native Archive Hero** (eyebrow +
   oversized site title + mono nav) and **Native Archive List** (hairline-ruled
   Query Loop with mono dates, pill categories, and all/writing/notes filter
@@ -52,10 +54,10 @@ title, and automatic dark mode via `prefers-color-scheme`.
 
 ## After activating
 
-- Global Styles customizations are stored **per theme**, so the orange
-  palette you customized on Ollie itself won't carry over — the child starts
-  from this theme.json. Your old look stays intact on the parent theme if you
-  ever switch back.
+- Global Styles customizations are stored **per theme**, so the palette you
+  customized on Ollie itself won't carry over — the child starts from this
+  theme.json. Your old look stays intact on the parent theme if you ever switch
+  back.
 - Template and template-part edits you made in the Site Editor are also
   per-theme. Rebuild the header/homepage with the two bundled patterns, or
   copy your existing layouts across and add the `dw-*` classes where you want

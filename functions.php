@@ -37,40 +37,168 @@ add_action( 'wp_enqueue_scripts', function () {
 }, 20 );
 
 /**
- * Notes synced from Nostr/Farcaster usually carry tweet URLs inline,
+ * Notes synced from Nostr/Farcaster usually carry tweet or video URLs inline,
  * mid-sentence — but WordPress only auto-embeds URLs that sit alone on
- * their own line. Lift twitter/x status links still sitting in plain
- * text and append the embed card after the note. Render-time only: the
- * stored note content stays verbatim to the synced event.
+ * their own line. Lift still-plain twitter/x status links and common video
+ * URLs (including those wrapped in <a href>) and append cards after the
+ * note. Render-time only: stored note content stays verbatim to the event.
  *
- * Runs at priority 20 — after core autoembed (8), wpautop (10), and
- * any plugin content filters — and the lookbehinds only match URLs
- * that are not already inside markup (an href, an embed blockquote's
- * link text). So if the sync plugin later ships its own embedding,
- * nothing here matches and this filter is a natural no-op. No
- * coordination between theme and plugin required.
+ * Runs at priority 20 — after core autoembed (8), wpautop (10), and plugin
+ * content filters. Nostr for WP defers to this filter on Wonder Burrow via
+ * nfw_note_embeds_enabled.
  */
+add_filter( 'nfw_note_embeds_enabled', '__return_false' );
+
+/**
+ * URL variants for matching the same tweet/video link in stored HTML.
+ *
+ * @param string $url Normalized embed URL.
+ * @return string[]
+ */
+function wonder_burrow_embed_url_variants( $url ) {
+	$url      = untrailingslashit( html_entity_decode( $url, ENT_QUOTES, 'UTF-8' ) );
+	$variants = array( $url );
+
+	if ( preg_match( '#^https://x\.com#i', $url ) ) {
+		$variants[] = preg_replace( '#^https://x\.com#i', 'https://twitter.com', $url );
+	}
+	if ( preg_match( '#^https://twitter\.com#i', $url ) ) {
+		$variants[] = preg_replace( '#^https://twitter\.com#i', 'https://x.com', $url );
+	}
+	if ( preg_match( '#^https://www\.#i', $url ) ) {
+		$variants[] = preg_replace( '#^https://www\.#i', 'https://', $url );
+	} elseif ( preg_match( '#^https://#i', $url ) ) {
+		$variants[] = preg_replace( '#^https://#i', 'https://www.', $url );
+	}
+
+	return array_values( array_unique( array_filter( $variants ) ) );
+}
+
+/**
+ * Remove a URL from note HTML once it is represented by an embed card.
+ *
+ * @param string $content Post HTML.
+ * @param string $url     Embedded URL.
+ * @return string
+ */
+function wonder_burrow_remove_embed_url_from_content( $content, $url ) {
+	foreach ( wonder_burrow_embed_url_variants( $url ) as $variant ) {
+		$quoted = preg_quote( $variant, '#' );
+
+		$content = preg_replace(
+			'#<a[^>]+href=["\']' . $quoted . '["\'][^>]*>.*?</a>#is',
+			'',
+			$content
+		);
+
+		$content = preg_replace( '#\s*' . $quoted . '\s*#i', ' ', $content );
+	}
+
+	$content = preg_replace( '#<p>\s*(<br\s*/?>\s*)*</p>#i', '', $content );
+	$content = preg_replace( '#\s{2,}#', ' ', $content );
+
+	return trim( $content );
+}
+
+/**
+ * Whether note HTML already contains an embed for this URL.
+ *
+ * @param string $content Post HTML.
+ * @param string $url     Candidate URL.
+ * @return bool
+ */
+function wonder_burrow_url_already_embedded( $content, $url ) {
+	if ( preg_match( '#(?:twitter|x)\.com/.+/status/(\d+)#i', $url, $m ) ) {
+		$status_id = $m[1];
+		if ( false !== strpos( $content, 'status/' . $status_id )
+			&& preg_match( '#<(?:blockquote[^>]*twitter-tweet|figure[^>]*dw-note-embed)#i', $content ) ) {
+			return true;
+		}
+	}
+
+	if ( preg_match( '#(?:youtu\.be/|youtube\.com/watch\?v=)([A-Za-z0-9_-]+)#', $url, $m ) ) {
+		$video_id = $m[1];
+		if ( preg_match( '#<iframe[^>]+(?:youtube|youtu\.be)#i', $content )
+			|| ( false !== strpos( $content, $video_id ) && preg_match( '#dw-note-embed#', $content ) ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 add_filter( 'the_content', function ( $content ) {
 	if ( 'note' !== get_post_type() ) {
 		return $content;
 	}
 
-	if ( ! preg_match_all( '#(?<!href=")(?<!href=\')(?<!">)https?://(?:www\.)?(?:twitter\.com|x\.com)/[\w.]+/status/\d+#i', $content, $matches ) ) {
+	if ( doing_filter( 'get_the_excerpt' ) ) {
+		return $content;
+	}
+
+	$urls = array();
+
+	if ( preg_match_all( '#(?<!href=")(?<!href=\')(?<!src=")(?<!src=\')(?<!">)https?://(?:www\.)?(?:twitter\.com|x\.com)/[\w.]+/status/\d+#i', $content, $plain ) ) {
+		$urls = array_merge( $urls, $plain[0] );
+	}
+
+	if ( preg_match_all( '#<a[^>]+href=["\'](https?://[^"\']+)["\'][^>]*>#i', $content, $anchors ) ) {
+		foreach ( $anchors[1] as $url ) {
+			if ( preg_match( '#(?:twitter\.com|x\.com)/[\w.]+/status/\d+#i', $url )
+				|| preg_match( '#(?:youtube\.com/watch\?|youtu\.be/)#i', $url ) ) {
+				$urls[] = $url;
+			}
+		}
+	}
+
+	if ( preg_match_all( '#(?<!href=")(?<!href=\')(?<!src=")(?<!src=\')(?<!">)https?://(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)[^\s<>"\'\]]+#i', $content, $videos ) ) {
+		$urls = array_merge( $urls, $videos[0] );
+	}
+
+	$urls = array_values( array_unique( array_filter( array_map( 'esc_url_raw', $urls ) ) ) );
+	$urls = array_values( array_filter( $urls, function ( $url ) use ( $content ) {
+		return ! wonder_burrow_url_already_embedded( $content, $url );
+	} ) );
+	if ( empty( $urls ) ) {
 		return $content;
 	}
 
 	global $wp_embed;
-	$append = '';
-	foreach ( array_unique( $matches[0] ) as $url ) {
-		$embed = $wp_embed->shortcode( array(), $url );
-		if ( $embed && ( false !== strpos( $embed, '<blockquote' ) || false !== strpos( $embed, '<iframe' ) ) ) {
-			$append .= '<figure class="dw-note-embed">' . $embed . '</figure>';
+	if ( ! $wp_embed instanceof WP_Embed ) {
+		if ( ! class_exists( 'WP_Embed' ) ) {
+			require_once ABSPATH . WPINC . '/class-wp-embed.php';
+		}
+		$wp_embed = new WP_Embed();
+	}
+
+	$append   = '';
+	$embedded = array();
+
+	foreach ( $urls as $url ) {
+		if ( preg_match( '#^https://x\.com#i', $url ) ) {
+			$url = preg_replace( '#^https://x\.com#i', 'https://twitter.com', $url );
+		}
+
+		$embed      = $wp_embed->shortcode( array(), $url );
+		$did_embed  = false;
+
+		if ( $embed && ( false !== strpos( $embed, '<blockquote' ) || false !== strpos( $embed, '<iframe' ) || false !== strpos( $embed, 'twitter-tweet' ) ) ) {
+			$append    .= '<figure class="dw-note-embed">' . $embed . '</figure>';
+			$did_embed  = true;
 		} elseif ( preg_match( '#(?:twitter|x)\.com/([\w.]+)/status/#i', $url, $m ) ) {
-			// X's oEmbed endpoint is unreliable; fall back to a styled
-			// link card so the note still gets a visual affordance.
-			$append .= '<p class="dw-note-embed dw-embed-card"><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">@' . esc_html( $m[1] ) . ' on X ↗</a></p>';
+			$append    .= '<p class="dw-note-embed dw-embed-card"><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">@' . esc_html( $m[1] ) . ' on X ↗</a></p>';
+			$did_embed  = true;
+		}
+
+		if ( $did_embed ) {
+			$embedded[] = $url;
 		}
 	}
+
+	foreach ( $embedded as $url ) {
+		$content = wonder_burrow_remove_embed_url_from_content( $content, $url );
+	}
+
 	return $content . $append;
 }, 20 );
 
@@ -175,17 +303,17 @@ add_filter( 'wp_theme_json_data_theme', function ( $theme_json ) {
 		'settings' => array(
 			'color' => array(
 				'palette' => array(
-					array( 'name' => 'Primary', 'slug' => 'primary', 'color' => '#FF6B0A' ),
-					array( 'name' => 'Primary Accent', 'slug' => 'primary-accent', 'color' => '#FBEADC' ),
-					array( 'name' => 'Primary Alt', 'slug' => 'primary-alt', 'color' => '#FFB27A' ),
-					array( 'name' => 'Primary Alt Accent', 'slug' => 'primary-alt-accent', 'color' => '#4A2410' ),
-					array( 'name' => 'Main', 'slug' => 'main', 'color' => '#171411' ),
-					array( 'name' => 'Main Accent', 'slug' => 'main-accent', 'color' => '#DAD4C9' ),
-					array( 'name' => 'Base', 'slug' => 'base', 'color' => '#F7F4EC' ),
-					array( 'name' => 'Secondary', 'slug' => 'secondary', 'color' => '#6C6258' ),
-					array( 'name' => 'Tertiary', 'slug' => 'tertiary', 'color' => '#FFFAF0' ),
-					array( 'name' => 'Border Light', 'slug' => 'border-light', 'color' => '#E2DCD1' ),
-					array( 'name' => 'Border Dark', 'slug' => 'border-dark', 'color' => '#4A443D' ),
+					array( 'name' => 'Primary', 'slug' => 'primary', 'color' => '#CE4770' ),
+					array( 'name' => 'Primary Accent', 'slug' => 'primary-accent', 'color' => '#DED5D0' ),
+					array( 'name' => 'Primary Alt', 'slug' => 'primary-alt', 'color' => '#D4572B' ),
+					array( 'name' => 'Primary Alt Accent', 'slug' => 'primary-alt-accent', 'color' => '#B16803' ),
+					array( 'name' => 'Main', 'slug' => 'main', 'color' => '#2C232E' ),
+					array( 'name' => 'Main Accent', 'slug' => 'main-accent', 'color' => '#A59C9C' ),
+					array( 'name' => 'Base', 'slug' => 'base', 'color' => '#F8EFE7' ),
+					array( 'name' => 'Secondary', 'slug' => 'secondary', 'color' => '#72696D' ),
+					array( 'name' => 'Tertiary', 'slug' => 'tertiary', 'color' => '#FDF7F3' ),
+					array( 'name' => 'Border Light', 'slug' => 'border-light', 'color' => '#DED5D0' ),
+					array( 'name' => 'Border Dark', 'slug' => 'border-dark', 'color' => '#A59C9C' ),
 				),
 			),
 		),
