@@ -335,3 +335,42 @@ add_filter( 'query_loop_block_query_vars', function ( $query, $block ) {
 	}
 	return $query;
 }, 10, 2 );
+
+/**
+ * Self-update from GitHub Releases through core's `Update URI` support
+ * (WP 6.1+). Each v* tag runs .github/workflows/release.yml, which
+ * attaches wonder-burrow.zip plus a release.json manifest to the release.
+ * The manifest is fetched from the "latest" download redirect, so no
+ * GitHub API call (or API rate limit) is involved. Core compares versions
+ * and installs the package like any other theme update; this only says
+ * where the newest one lives.
+ */
+add_filter( 'update_themes_github.com', function ( $update, $theme_data, $stylesheet ) {
+	if ( 'wonder-burrow' !== $stylesheet ) {
+		return $update;
+	}
+
+	$repo     = 'https://github.com/danieljwonder/wonder-burrow';
+	$response = wp_remote_get( $repo . '/releases/latest/download/release.json', array( 'timeout' => 10 ) );
+	if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+		return $update;
+	}
+
+	$release = json_decode( wp_remote_retrieve_body( $response ), true );
+	if ( empty( $release['version'] ) || empty( $release['package'] ) ) {
+		return $update;
+	}
+
+	// Only ever install packages attached to this repo's releases.
+	$package = (string) $release['package'];
+	if ( 0 !== strpos( $package, $repo . '/releases/download/' ) ) {
+		return $update;
+	}
+
+	return array(
+		'theme'   => $stylesheet,
+		'version' => sanitize_text_field( $release['version'] ),
+		'url'     => $repo . '/releases',
+		'package' => $package,
+	);
+}, 10, 3 );

@@ -64,3 +64,21 @@ metadata, hairline rules, oversized display title, and automatic dark mode via
   the draft's details.
 - Dark mode follows the visitor's OS setting. Check any images/logos that
   assume a light background.
+
+## Releasing and updating the live site
+
+This repo is the source of truth for the theme. The site updates from it
+through WordPress's normal theme updater (core `Update URI` support, WP 6.1+):
+
+1. Bump `Version:` in `style.css` and commit.
+2. Tag that commit `v<version>` (e.g. `v0.13.1`) and push the tag.
+3. `.github/workflows/release.yml` checks the tag matches `style.css`, builds
+   `wonder-burrow.zip` (top folder `wonder-burrow/`, no `.github`) with
+   `git archive`, and publishes a GitHub Release with the zip and a
+   `release.json` manifest.
+4. WordPress sees the new version on its next update check (Dashboard →
+   Updates → Check again forces it). Update from wp-admin or Hermes
+   wp-manager.
+
+The updater in `functions.php` only accepts packages from this repo's release
+downloads.
