@@ -32,7 +32,7 @@ metadata, hairline rules, oversized display title, and automatic dark mode via
   of that Query Loop shows just posts. If the `note` CPT doesn't exist
   (plugin deactivated), the query falls back to posts only.
 
-- **The rabbit 🐇.** Each archive item gets a source-reveal button
+- **The rabbit.** Each archive item gets a source-reveal button
   (`assets/rabbit.js`). It reads provenance from a read-only theme REST
   endpoint (`wonder-burrow/v1/source/<id>`) that assembles the metadata
   written by the Nostr for WP plugin (`_nostr_event_id`, synced-at, the
